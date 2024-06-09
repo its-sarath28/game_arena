@@ -2,9 +2,11 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 
 const User = require("../../models/User");
-const generateToken = require("../../utils/generateToken");
 
-const signUpController = async (req, res) => {
+const generateToken = require("../../utils/generateToken");
+const appError = require("../../utils/appError");
+
+const signUpController = async (req, res, next) => {
   const { name, username, email, password } = req.body;
 
   const errors = validationResult(req);
@@ -46,8 +48,7 @@ const signUpController = async (req, res) => {
     });
 
     if (!newUser) {
-      formattedErrors.general = "Error in creating new user";
-      return res.status(500).json({ errors: formattedErrors });
+      return next(appError("Error in creating new user", 500));
     }
 
     res.status(200).json({
@@ -55,7 +56,7 @@ const signUpController = async (req, res) => {
       token: generateToken(newUser._id, newUser.role),
     });
   } catch (err) {
-    console.log(err);
+    next(appError(err));
   }
 };
 
@@ -94,7 +95,7 @@ const signInController = async (req, res) => {
       token: generateToken(userFound._id, userFound.role),
     });
   } catch (err) {
-    console.log(err);
+    next(appError(err));
   }
 };
 
