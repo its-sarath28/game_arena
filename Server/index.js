@@ -4,6 +4,7 @@ const authRouter = require("./routes/authRoute/authRouter");
 
 require("dotenv").config();
 require("./config/dbConnect");
+require("./config/dbSeeder");
 
 const app = express();
 

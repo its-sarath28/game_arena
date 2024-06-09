@@ -52,7 +52,7 @@ const signUpController = async (req, res) => {
 
     res.status(200).json({
       message: "User created successfully",
-      token: generateToken(newUser._id),
+      token: generateToken(newUser._id, newUser.role),
     });
   } catch (err) {
     console.log(err);
@@ -91,7 +91,7 @@ const signInController = async (req, res) => {
 
     res.status(200).json({
       message: "Logged in",
-      token: generateToken(userFound._id),
+      token: generateToken(userFound._id, userFound.role),
     });
   } catch (err) {
     console.log(err);
