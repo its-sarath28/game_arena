@@ -24,7 +24,7 @@ characterRouter.post(
       .trim()
       .notEmpty()
       .withMessage("Character name is required")
-      .isAlphanumeric()
+      .matches(/^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$/)
       .withMessage("Character name can only contain letters and numbers")
       .isLength({ min: 3 })
       .withMessage("Character name should be atleast 3 characters long"),
@@ -33,19 +33,25 @@ characterRouter.post(
       .notEmpty()
       .withMessage("Strength is required")
       .isNumeric()
-      .withMessage("Strength must be a number"),
+      .withMessage("Strength must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Strength must be a above 1"),
     body("health")
       .trim()
       .notEmpty()
       .withMessage("Health is required")
       .isNumeric()
-      .withMessage("Health must be a number"),
+      .withMessage("Health must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Health must be a above 1"),
     body("attack")
       .trim()
       .notEmpty()
       .withMessage("Attack is required")
       .isNumeric()
-      .withMessage("Attack must be a number"),
+      .withMessage("Attack must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Attack must be a above 1"),
     check("image").custom((value, { req }) => {
       if (!req.files?.image) {
         throw new Error("Character image is required");
@@ -66,7 +72,7 @@ characterRouter.put(
       .trim()
       .notEmpty()
       .withMessage("Character name is required")
-      .isAlphanumeric()
+      .matches(/^[a-zA-Z0-9]+(-[a-zA-Z0-9]+)*$/)
       .withMessage("Character name can only contain letters and numbers")
       .isLength({ min: 3 })
       .withMessage("Character name should be atleast 3 characters long"),
@@ -75,19 +81,25 @@ characterRouter.put(
       .notEmpty()
       .withMessage("Strength is required")
       .isNumeric()
-      .withMessage("Strength must be a number"),
+      .withMessage("Strength must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Strength must be a above 1"),
     body("health")
       .trim()
       .notEmpty()
       .withMessage("Health is required")
       .isNumeric()
-      .withMessage("Health must be a number"),
+      .withMessage("Health must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Health must be a above 1"),
     body("attack")
       .trim()
       .notEmpty()
       .withMessage("Attack is required")
       .isNumeric()
-      .withMessage("Attack must be a number"),
+      .withMessage("Attack must be a number")
+      .isInt({ min: 1 })
+      .withMessage("Value of Attack must be a above 1"),
     check("image").custom((value, { req }) => {
       if (!req.body.image && !req.files?.image) {
         throw new Error("Character image is required");
