@@ -4,6 +4,7 @@ const cors = require("cors");
 const authRouter = require("./routes/authRoute/authRouter");
 
 const globalErrorHandler = require("./middlewares/globalErrorHandler");
+const characterRouter = require("./routes/characterRoute/characterRouter");
 
 require("dotenv").config();
 require("./config/dbConnect");
@@ -18,6 +19,7 @@ app.use(cors());
 
 //routers
 app.use("/api/v1/auth", authRouter);
+app.use("/api/v1/character", characterRouter);
 
 //global errors
 app.use(globalErrorHandler);
