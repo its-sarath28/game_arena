@@ -1,6 +1,12 @@
 const { validationResult } = require("express-validator");
+
 const Character = require("../../models/Character");
+
 const appError = require("../../utils/appError");
+const {
+  uploadToFirebase,
+  deleteFromFirebase,
+} = require("../../utils/imageOperation");
 
 const getAllCharactersController = async (req, res, next) => {
   try {
@@ -27,6 +33,12 @@ const createCharacterController = async (req, res, next) => {
   }
 
   try {
+    let imageURL = "";
+
+    if (req.file) {
+      imageURL = await uploadToFirebase(req.file);
+    }
+
     const newCharacterName = characterName.toLowerCase();
 
     const characterFound = await Character.findOne({
@@ -43,6 +55,7 @@ const createCharacterController = async (req, res, next) => {
       strength,
       attack,
       health,
+      imageURL,
     });
 
     if (!newCharacter) {
@@ -96,6 +109,19 @@ const updateCharacterController = async (req, res, next) => {
       return next(appError("Character not found", 404));
     }
 
+    let imageURL = characterToUpdate.imageURL;
+
+    // If a new file is uploaded
+    if (req.file) {
+      // Delete the old file from Firebase
+      if (imageURL) {
+        await deleteFromFirebase(imageURL);
+      }
+
+      // Upload the new file to Firebase
+      imageURL = await uploadToFirebase(req.file);
+    }
+
     await Character.findByIdAndUpdate(
       req.params.characterId,
       {
@@ -103,6 +129,7 @@ const updateCharacterController = async (req, res, next) => {
         strength,
         attack,
         health,
+        imageURL,
       },
       {
         new: true,
@@ -125,6 +152,12 @@ const deleteCharacterController = async (req, res, next) => {
 
     if (!characterToDelete) {
       return next(appError("Character not found", 404));
+    }
+
+    let imageURL = characterToDelete.imageURL;
+
+    if (imageURL) {
+      await deleteFromFirebase(imageURL);
     }
 
     await Character.findByIdAndDelete(characterId);

@@ -1,5 +1,5 @@
 const express = require("express");
-const { body } = require("express-validator");
+const { body, check } = require("express-validator");
 
 const characterRouter = express.Router();
 
@@ -12,11 +12,13 @@ const {
 } = require("../../controllers/character/characterController");
 const isAuthenticated = require("../../middlewares/isAuthenticated");
 const isAdmin = require("../../middlewares/isAdmin");
+const { upload } = require("../../utils/imageOperation");
 
 characterRouter.get("/", isAuthenticated, getAllCharactersController);
 
 characterRouter.post(
   "/create-character",
+  upload.single("image"),
   [
     body("characterName")
       .trim()
@@ -44,6 +46,12 @@ characterRouter.post(
       .withMessage("Attack is required")
       .isNumeric()
       .withMessage("Attack must be a number"),
+    check("image").custom((value, { req }) => {
+      if (!req.files?.image) {
+        throw new Error("Character image is required");
+      }
+      return true;
+    }),
   ],
   isAuthenticated,
   isAdmin,
@@ -52,6 +60,7 @@ characterRouter.post(
 
 characterRouter.put(
   "/update-character/:characterId",
+  upload.single("image"),
   [
     body("characterName")
       .trim()
@@ -79,6 +88,12 @@ characterRouter.put(
       .withMessage("Attack is required")
       .isNumeric()
       .withMessage("Attack must be a number"),
+    check("image").custom((value, { req }) => {
+      if (!req.body.image && !req.files?.image) {
+        throw new Error("Character image is required");
+      }
+      return true;
+    }),
   ],
   isAuthenticated,
   isAdmin,
