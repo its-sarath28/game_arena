@@ -2,6 +2,7 @@ const bcrypt = require("bcryptjs");
 const { validationResult } = require("express-validator");
 
 const User = require("../../models/User");
+const Character = require("../../models/Character");
 
 const generateToken = require("../../utils/generateToken");
 const appError = require("../../utils/appError");
@@ -37,6 +38,16 @@ const signUpController = async (req, res, next) => {
       return res.status(409).json({ errors: formattedErrors });
     }
 
+    // Find the Gornak character
+    const initialCharacter = await Character.findOne({
+      characterName: "Gornak",
+    });
+
+    if (!initialCharacter) {
+      // Handle case if Gornak character doesn't exist
+      return next(appError("Gornak character not found", 404));
+    }
+
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password, salt);
 
@@ -45,6 +56,7 @@ const signUpController = async (req, res, next) => {
       username: newUsername,
       email: newEmail,
       password: hashedPassword,
+      characters: [initialCharacter._id],
     });
 
     if (!newUser) {

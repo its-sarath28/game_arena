@@ -1,8 +1,13 @@
+const fs = require("fs");
+const path = require("path");
 const bcrypt = require("bcryptjs");
 
 const User = require("../models/User");
+const Character = require("../models/Character");
 
-const createAdmin = async (req, res) => {
+const { uploadToFirebase } = require("../utils/imageOperation");
+
+const createAdmin = async (req, res, next) => {
   try {
     const name = "Super admin";
     const username = "super-admin";
@@ -27,11 +32,50 @@ const createAdmin = async (req, res) => {
       console.log("Admin created successfully");
     } else {
       console.log("Admin is present");
-      return null;
     }
-  } catch (error) {
-    console.log(`Error in seeding`);
+  } catch (err) {
+    console.log("Error in seeding admin:", err.message);
   }
 };
 
-createAdmin();
+const createCharacter = async (req, res, next) => {
+  try {
+    const characterName = "Gornak";
+    const health = 200;
+    const strength = 90;
+    const attack = 60;
+    const characterImagePath = path.join(__dirname, "../assets/Character1.jpg");
+
+    const characterFound = await Character.findOne({ characterName });
+
+    let imageURL = "";
+    if (!characterFound) {
+      const imageBuffer = fs.readFileSync(characterImagePath);
+      const file = {
+        originalname: path.basename(characterImagePath),
+        buffer: imageBuffer,
+      };
+
+      imageURL = await uploadToFirebase(file);
+
+      await Character.create({
+        characterName,
+        strength,
+        attack,
+        health,
+        imageURL,
+      });
+
+      console.log("Character added successfully");
+    } else {
+      console.log("Character is present");
+    }
+  } catch (err) {
+    console.log("Error in seeding character:", err.message);
+  }
+};
+
+(async () => {
+  await createAdmin();
+  await createCharacter();
+})();

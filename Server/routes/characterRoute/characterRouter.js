@@ -53,7 +53,7 @@ characterRouter.post(
       .isInt({ min: 1 })
       .withMessage("Value of Attack must be a above 1"),
     check("image").custom((value, { req }) => {
-      if (!req.files?.image) {
+      if (!req.file) {
         throw new Error("Character image is required");
       }
       return true;
@@ -101,7 +101,7 @@ characterRouter.put(
       .isInt({ min: 1 })
       .withMessage("Value of Attack must be a above 1"),
     check("image").custom((value, { req }) => {
-      if (!req.body.image && !req.files?.image) {
+      if (!req.body.image && !req.file) {
         throw new Error("Character image is required");
       }
       return true;
